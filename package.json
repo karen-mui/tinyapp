@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/karen-mui/tinyapp/issues"
   },
-  "homepage": "https://github.com/karen-mui/tinyapp#readme"
+  "homepage": "https://github.com/karen-mui/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
