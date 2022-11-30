@@ -5,7 +5,7 @@ const PORT = 8080;
 
 const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 9);
-}
+};
 
 app.set("view engine", "ejs");
 
@@ -23,14 +23,20 @@ app.get("/urls", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
-  const shortForm = generateRandomString();
-  urlDatabase.shortForm = req.body.LongURL
-  res.redirect(`/urls/${shortForm}`)
+  // res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.LongURL;
+  res.redirect(`/urls/${shortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+// redirect from /urls to /urls:id
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id]
+  res.redirect(longURL);
 });
 
 app.get("/urls/:id", (req, res) => {
