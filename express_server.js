@@ -32,23 +32,45 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 9);
 };
 
-const checkUsersEmails = function(newEmail) {
+const checkUsersEmail = function(emailEntered) {
   for (let user in users) {
-    if (users[user].email === newEmail) {
+    if (users[user].email === emailEntered) {
       return true;
     }
   }
   return false;
 };
 
+const checkUsersPassword = function(passwordEntered) {
+  for (let user in users) {
+    if (users[user].password === passwordEntered) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const getUserID = function(email) {
+  for (let user in users) {
+    if (users[user].email === email) {
+      return user;
+    }
+  }
+};
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
-  res.cookie("userID", req.body.userID);
-  res.redirect('/urls');
+
+  if (!checkUsersEmail(req.body["email"])) {
+    res.status(403).send('Email cannot be found');
+  } else if (!checkUsersPassword(req.body["password"])) {
+    res.status(403).send('Password does not match');
+  } else {
+    const ID = getUserID(req.body["email"]);
+    res.cookie("userID", ID);
+    res.redirect('/urls');
+  }
 });
 
-// login page
 app.get("/login", (req, res) => {
   const templateVars = {
     userObj: users[req.cookies["userID"]],
@@ -58,8 +80,7 @@ app.get("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("userID", req.body.userID);
-  console.log(users);
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 app.get("/urls", (req, res) => {
@@ -98,10 +119,10 @@ app.post("/register", (req, res) => {
   if (req.body["email"] === "" || req.body["password"] === "") {
     res.status(400).send('Invalid email or password');
 
-  } else if (checkUsersEmails(req.body["email"])) {
+  } else if (checkUsersEmail(req.body["email"])) {
     res.status(400).send('Email already in use');
-  
-  }  else {
+
+  } else {
     const userID = generateRandomString();
     users[userID] = {
       userID: userID,
