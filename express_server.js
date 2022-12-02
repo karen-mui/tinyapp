@@ -51,8 +51,7 @@ app.post("/login", (req, res) => {
 // login page
 app.get("/login", (req, res) => {
   const templateVars = {
-    // userObj: users[req.cookies["userID"]],
-    // urls: urlDatabase
+    userObj: users[req.cookies["userID"]],
   };
   res.render("login", templateVars);
 });

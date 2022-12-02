@@ -17,14 +17,9 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <% if (!userObj) { %>
+          <form class="form-inline" action="/register" method="POST">
+            <button type="submit" class="btn btn-primary">Register</button>
           <form class="form-inline" action="/login" method="POST">
-              <input
-                class="form-control"
-                type="text"
-                name="userID"
-                placeholder="userID"
-                style="width: 200px"
-              /> 
               <button type="submit" class="btn btn-primary">Login</button>
         <% } else { %>
           <form class="form-inline" action="/logout" method="POST">
