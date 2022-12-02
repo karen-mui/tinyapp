@@ -32,14 +32,34 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 9);
 };
 
+const checkUsersEmails = function(newEmail) {
+  for (let user in users) {
+    if (users[user].email === newEmail) {
+      return true;
+    }
+  }
+  return false;
+};
+
+
 app.post("/login", (req, res) => {
   console.log(req.body);
   res.cookie("userID", req.body.userID);
   res.redirect('/urls');
 });
 
+// login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    // userObj: users[req.cookies["userID"]],
+    // urls: urlDatabase
+  };
+  res.render("login", templateVars);
+});
+
 app.post("/logout", (req, res) => {
   res.clearCookie("userID", req.body.userID);
+  console.log(users);
   res.redirect('/urls');
 });
 
@@ -48,7 +68,7 @@ app.get("/urls", (req, res) => {
     userObj: users[req.cookies["userID"]],
     urls: urlDatabase
   };
-  console.log('templateVars', templateVars)
+  // console.log('templateVars', templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -76,15 +96,22 @@ app.get("/register", (req, res) => {
 
 // endpoint for registration
 app.post("/register", (req, res) => {
-  const userID = generateRandomString();
-  users[userID] = {
-    userID: userID,
-    email: req.body["email"],
-    password: req.body["password"]
-  };
-  res.cookie("userID", userID);
-  console.log(users[userID]);
-  res.redirect("/urls");
+  if (req.body["email"] === "" || req.body["password"] === "") {
+    res.status(400).send('Invalid email or password');
+
+  } else if (checkUsersEmails(req.body["email"])) {
+    res.status(400).send('Email already in use');
+  
+  }  else {
+    const userID = generateRandomString();
+    users[userID] = {
+      userID: userID,
+      email: req.body["email"],
+      password: req.body["password"]
+    };
+    res.cookie("userID", userID);
+    res.redirect("/urls");
+  }
 });
 
 // redirect from /urls to /urls:id
