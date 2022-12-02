@@ -10,23 +10,9 @@ app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
 
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+const urlDatabase = {};
 
-const users = {
-  userRandomID: {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur",
-  },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
-  },
-};
+const users = {};
 
 const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 9);
@@ -97,13 +83,18 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  if (!req.cookies["userID"]) {
+    res.status(401).send('Must login to access page');
+  }
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies["userID"]) {
+    res.redirect('/login');
+  }
   const templateVars = {
     userObj: users[req.cookies["userID"]]
   };
