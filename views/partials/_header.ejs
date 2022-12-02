@@ -16,19 +16,19 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <% if (!username) { %>
+        <% if (!userObj) { %>
           <form class="form-inline" action="/login" method="POST">
               <input
                 class="form-control"
                 type="text"
-                name="username"
-                placeholder="Username"
+                name="userID"
+                placeholder="userID"
                 style="width: 200px"
               /> 
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary">Login</button>
         <% } else { %>
           <form class="form-inline" action="/logout" method="POST">
-            Logged in as: <%= username %>!
+            Logged in as: <%= userObj.email %>!
             <button type="submit" class="btn btn-primary">Logout</button>
             <% } %>
           </div>
