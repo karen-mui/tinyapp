@@ -72,10 +72,14 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  const templateVars = {
-    userObj: users[req.cookies["userID"]],
-  };
-  res.render("login", templateVars);
+  if (req.cookies["userID"]) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      userObj: users[req.cookies["userID"]],
+    };
+    res.render("login", templateVars);
+  }
 });
 
 app.post("/logout", (req, res) => {
@@ -108,10 +112,14 @@ app.get("/urls/new", (req, res) => {
 
 // gets the registration page
 app.get("/register", (req, res) => {
-  const templateVars = {
-    userObj: users[req.cookies["userID"]]
-  };
-  res.render("register", templateVars);
+  if (req.cookies["userID"]) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      userObj: users[req.cookies["userID"]]
+    };
+    res.render("register", templateVars);
+  }
 });
 
 // endpoint for registration
