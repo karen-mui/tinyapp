@@ -1,7 +1,7 @@
 const { render } = require("ejs");
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const getUserByEmail = require("./helpers.js")
+const { getUserByEmail } = require("./helpers.js")
 const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080;
@@ -67,14 +67,12 @@ app.post("/login", (req, res) => {
   } else {
     const ID = getUserID(req.body["email"]);
     req.session["userID"] = ID;
-    // res.cookie("userID", ID);
     res.redirect('/urls');
   }
 });
 
 app.get("/login", (req, res) => {
   if (req.session["userID"]) {
-    // if (req.cookies["userID"]) {
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -95,11 +93,10 @@ app.get("/urls", (req, res) => {
   } else {
     const userSpecificObj = urlsForUser(req.session["userID"]);
     const templateVars = {
-      userObj: userSpecificObj,
+      userObj: users[req.session["userID"]],
+      userURLs: userSpecificObj
     };
-    // console.log('templateVars', templateVars);
     res.render("urls_index", templateVars);
-    // console.log(urlDatabase);
   }
 });
 
@@ -113,7 +110,6 @@ app.post("/urls", (req, res) => {
       longURL: req.body.longURL,
       userID: req.session["userID"]
     };
-    // console.log(urlDatabase);
     res.redirect(`/urls/${shortURL}`);
   }
 });
@@ -128,7 +124,6 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-// gets the registration page
 app.get("/register", (req, res) => {
   if (req.session["userID"]) {
     res.redirect('/urls');
@@ -141,7 +136,6 @@ app.get("/register", (req, res) => {
   }
 });
 
-// endpoint for registration
 app.post("/register", (req, res) => {
   if (req.body["email"] === "" || req.body["password"] === "") {
     res.status(400).send('Invalid email or password');
