@@ -1,7 +1,8 @@
 const { render } = require("ejs");
 const express = require("express");
 const bcrypt = require("bcryptjs");
-var cookieSession = require('cookie-session')
+const getUserByEmail = require("./helpers.js")
+const cookieSession = require('cookie-session');
 const app = express();
 const PORT = 8080;
 
@@ -23,20 +24,10 @@ const generateRandomString = function() {
   return Math.random().toString(36).slice(2, 9);
 };
 
-const checkUsersEmail = function(emailEntered) {
-  for (let user in users) {
-    if (users[user].email === emailEntered) {
-      return true;
-    }
-  }
-  return false;
-};
-
 const checkUserPassword = function(emailEntered, passwordEntered) {
   for (let user in users) {
     if (users[user].email === emailEntered) {
       return bcrypt.compareSync(passwordEntered, users[user].hashedPassword);
-      console.log('password entered: ', passwordEntered, 'hash password: ', users[user].hashedPassword);
     }
   }
 };
@@ -69,7 +60,7 @@ const urlsForUser = function(id) {
 };
 
 app.post("/login", (req, res) => {
-  if (!checkUsersEmail(req.body["email"])) {
+  if (!getUserByEmail((req.body["email"]), users)) {
     res.status(403).send('Email cannot be found');
   } else if (!checkUserPassword(req.body["email"], req.body["password"])) {
     res.status(403).send('Password does not match');
@@ -83,7 +74,7 @@ app.post("/login", (req, res) => {
 
 app.get("/login", (req, res) => {
   if (req.session["userID"]) {
-  // if (req.cookies["userID"]) {
+    // if (req.cookies["userID"]) {
     res.redirect('/urls');
   } else {
     const templateVars = {
@@ -94,7 +85,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  req.session = null
+  req.session = null;
   res.redirect('/login');
 });
 
@@ -141,6 +132,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/register", (req, res) => {
   if (req.session["userID"]) {
     res.redirect('/urls');
+
   } else {
     const templateVars = {
       userObj: users[req.session["userID"]]
@@ -154,7 +146,9 @@ app.post("/register", (req, res) => {
   if (req.body["email"] === "" || req.body["password"] === "") {
     res.status(400).send('Invalid email or password');
 
-  } else if (checkUsersEmail(req.body["email"])) {
+  } else if (getUserByEmail(req.body["email"], users)) {
+    console.log(req.body["email"]);
+    console.log(users);
     res.status(400).send('Email already in use');
 
   } else {
